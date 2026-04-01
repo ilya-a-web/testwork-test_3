@@ -3,28 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\StoreReviewRequest;
 use App\Models\Episode;
-use App\Models\Review;
-use App\Services\Rating\ReviewRatingService;
+use App\Services\Review\ReviewService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    public function store(Request $request, Episode $episode, ReviewRatingService $ratingService): JsonResponse
+    public function store(StoreReviewRequest $request, Episode $episode, ReviewService $reviewService): JsonResponse
     {
-        $validated = $request->validate([
-            'author' => ['required', 'string', 'max:255'],
-            'text' => ['required', 'string', 'max:5000'],
-        ]);
+        $validated = $request->validated();
 
-        $review = Review::query()->create([
-            'episode_id' => $episode->id,
-            'author' => $validated['author'],
-            'text' => $validated['text'],
-            'published_at' => now(),
-            'rating' => $ratingService->calculate($validated['text']),
-        ]);
+        $review = $reviewService->create($episode, $validated['author'], $validated['text']);
 
         return response()->json([
             'data' => $review,

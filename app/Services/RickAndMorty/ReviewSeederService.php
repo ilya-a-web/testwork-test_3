@@ -3,19 +3,21 @@
 namespace App\Services\RickAndMorty;
 
 use App\Models\Episode;
+use App\Repositories\ReviewRepository;
 use App\Services\Rating\ReviewRatingService;
 use Faker\Factory;
 use Illuminate\Support\Carbon;
 
 class ReviewSeederService
 {
-    public function __construct(private readonly ReviewRatingService $ratingService)
-    {
-    }
+    public function __construct(
+        private readonly ReviewRatingService $ratingService,
+        private readonly ReviewRepository $reviewRepository,
+    ) {}
 
     public function seedForEpisode(Episode $episode): int
     {
-        if ($episode->reviews()->exists()) {
+        if ($this->reviewRepository->existsForEpisode($episode)) {
             return 0;
         }
 
@@ -44,7 +46,7 @@ class ReviewSeederService
             ];
         }
 
-        $episode->reviews()->insert($rows);
+        $this->reviewRepository->insertMany($rows);
 
         return $count;
     }

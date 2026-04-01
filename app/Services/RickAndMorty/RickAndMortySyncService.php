@@ -2,8 +2,8 @@
 
 namespace App\Services\RickAndMorty;
 
-use App\Models\Character;
-use App\Models\Episode;
+use App\Repositories\CharacterRepository;
+use App\Repositories\EpisodeRepository;
 use Illuminate\Support\Carbon;
 
 class RickAndMortySyncService
@@ -11,6 +11,8 @@ class RickAndMortySyncService
     public function __construct(
         private readonly RickAndMortyApiClient $apiClient,
         private readonly ReviewSeederService $reviewSeeder,
+        private readonly CharacterRepository $characterRepository,
+        private readonly EpisodeRepository $episodeRepository,
     ) {
     }
 
@@ -45,7 +47,7 @@ class RickAndMortySyncService
             ];
         }, $characters);
 
-        Character::upsert($rows, ['external_id'], ['name', 'gender', 'status', 'url', 'updated_at']);
+        $this->characterRepository->upsert($rows);
     }
 
     private function syncEpisodes(array $episodes): void
@@ -65,13 +67,13 @@ class RickAndMortySyncService
             ];
         }, $episodes);
 
-        Episode::upsert($rows, ['external_id'], ['name', 'air_date', 'season', 'episode', 'code', 'updated_at']);
+        $this->episodeRepository->upsert($rows);
     }
 
     private function syncRelationsAndSeedReviews(array $episodes): int
     {
-        $characterByUrl = Character::query()->pluck('id', 'url')->all();
-        $episodesByExternalId = Episode::query()->get()->keyBy('external_id');
+        $characterByUrl = $this->characterRepository->idByUrlMap();
+        $episodesByExternalId = $this->episodeRepository->mapByExternalId();
 
         $seeded = 0;
 
@@ -88,7 +90,7 @@ class RickAndMortySyncService
                 }
             }
 
-            $episode->characters()->sync(array_values(array_unique($characterIds)));
+            $this->episodeRepository->syncCharacters($episode, $characterIds);
             $seeded += $this->reviewSeeder->seedForEpisode($episode);
         }
 
