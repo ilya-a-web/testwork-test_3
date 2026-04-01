@@ -1,0 +1,129 @@
+{
+  "info": {
+    "_postman_id": "3b92d8f0-1b6e-4f09-b6a9-2cbdf2f6d7aa",
+    "name": "Rick and Morty Test API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/up",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "up"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Episodes - Basic",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/episodes?per_page=5",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "episodes"
+          ],
+          "query": [
+            {
+              "key": "per_page",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Episodes - Filter + Sort",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/episodes?season=1&character_ids=1,2&sort_by=avg_rating&sort_dir=desc&per_page=5",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "episodes"
+          ],
+          "query": [
+            {
+              "key": "season",
+              "value": "1"
+            },
+            {
+              "key": "character_ids",
+              "value": "1,2"
+            },
+            {
+              "key": "sort_by",
+              "value": "avg_rating"
+            },
+            {
+              "key": "sort_dir",
+              "value": "desc"
+            },
+            {
+              "key": "per_page",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Review",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"author\": \"Ilya\",\n  \"text\": \"Отличная серия, очень понравилась!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/episodes/{{episodeId}}/reviews",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "episodes",
+            "{{episodeId}}",
+            "reviews"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "episodeId",
+      "value": "1"
+    }
+  ]
+}
